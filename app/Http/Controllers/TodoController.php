@@ -48,23 +48,41 @@ class TodoController extends Controller
 
     public function show ($id) {}
     
-    public function edit ($id) {}
+    public function edit($id){
+        $todo = Todo::find($id);
+
+        if (!$todo) {
+            return response()->json(['success' => false, 'data' => null, 'err' => 'Todo not found'], 404);
+        }
+
+        return response()->json(['success' => true, 'data' => $todo]);
+        // Alternatively, return a view with the todo data if rendering a form
+    }
+
 
     public function update(Request $request, $id) {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:255',
+            'description' => 'required|max:9999',
+        ]);
 
-    $request->validate([
-      'title'       => 'required|max:255',
-      'description' => 'required|max:9999'
-    ]);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'data' => null, 'errors' => $validator->errors()], 422);
+        }
 
-    $post = Post::find($id);
+        $todo = Todo::find($id);
 
-    $post->update($request->all());
+        if (!$todo) {
+            return response()->json(['success' => false, 'data' => null, 'err' => 'Todo not found'], 404);
+        }
 
-    return redirect()->route('todos.index')
-      ->with('success', 'Todo updated successfully.');
+        $todo->title = $request->title;
+        $todo->description = $request->description;
+        $todo->save();
 
+        return response()->json(['success' => true, 'data' => $todo]);
     }
+
 
     public function destroy ($id) {
         $todo = Todo::find($id);

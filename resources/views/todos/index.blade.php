@@ -222,7 +222,7 @@ $(document).ready(function () {
 
         const getFormData = (prefix = '') => {
             let data      = {};
-            let is_valied = true;
+            let is_valid = true;
            
             fields.forEach(field => {
                 let field_val = $(`#${prefix}${field}`).val();
@@ -231,12 +231,12 @@ $(document).ready(function () {
                     data[field] = field_val;
                     $(`#${prefix}${field}`).css('border', '');
                 } else {
-                    is_valied = false;
+                    is_valid = false;
                     $(`#${prefix}${field}`).css('border', '1px solid red');
                 }
             });
 
-            return is_valied ? data : is_valied;
+            return is_valid ? data : is_valid;
         }
 
         return {
@@ -255,6 +255,8 @@ $(document).ready(function () {
         View.renderTodos(todos);
 
         $('#todo-create-btn').on('click', View.toggleCreate);
+       
+        $('#todo-')
 
         $('#close-create-form-btn').on('click', () => View.toggleCreate(false));
 
@@ -304,16 +306,14 @@ $(document).ready(function () {
         $('#update-todo-btn').on('click', async function () {
             let todo_id = $(this).data('id');
             let data = View.getFormData('edit-');
+            let todos = await setters.updateTodoReq(todo_id, data);
 
-            if (Boolean(data)) {
-                let todos = await setters.updateTodoReq(todo_id, data);
+            View.renderTodos(todos);
 
-                View.renderTodos(todos);
+            View.toggleUpdate(false);
 
-                View.toggleUpdate(false);
+            View.renderSuccessMsg('Todo updated successfully!');
 
-                View.renderSuccessMsg('Todo updated successfully!');
-            }
         });
 
         $('#close-edit-form-btn').on('click', () => View.toggleUpdate(false));
